@@ -1,0 +1,6 @@
+https://www.geeksforgeeks.org/memory-management-in-operating-system/ (memory Management)
+https://www.geeksforgeeks.org/fixed-or-static-partitioning-in-operating-system/ (memory Partitioning Fixed)
+https://www.geeksforgeeks.org/variable-or-dynamic-partitioning-in-operating-system/ (Memory Partition Dynamic)
+https://www.geeksforgeeks.org/paging-in-operating-system/ (Simple paging)
+https://www.geeksforgeeks.org/segmentation-in-operating-system/ (SImple segmentation)
+https://www.geeksforgeeks.org/virtual-memory-in-operating-system/ (Virtual Memory+ Paging +Segmentation)
