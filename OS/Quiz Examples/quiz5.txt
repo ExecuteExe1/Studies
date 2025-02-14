@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Stack {
+  int top;
+  int capacity;
+  int* array;
+};
+ //initialize Stack
+struct Stack* createStack() {
+    struct Stack* stack = (struct Stack*)malloc(sizeof(struct Stack));
+    stack->top = -1; //empty stack
+    stack->capacity = 1;  //Elements before resize
+    stack->array = (int*)malloc(stack->capacity * sizeof(int)); //malloc element
+    return stack;
+}
+ //Function to check if the stack is empty
+int isEmpty(struct Stack* stack) {
+    return stack->top == -1;  //empty stack
+}
+ //Fuction to push
+void push(struct Stack* stack, int item) {
+    stack->top++; 
+    stack->array = (int*)realloc(stack->array, (stack->top + 1) * sizeof(int));
+    stack->array[stack->top] = item; //getting the item to the array[top] {to the top of the stack}
+}
+//Function push out?
+int pop(struct Stack* stack) {
+    if (isEmpty(stack)) {
+        fprintf(stderr, "Error: Stack underflow\n");
+        exit(1);
+    }
+    return stack->array[stack->top--]; //Increment top pointer
+}
+
+/* ==================== (ii) VECTOR: REALLOC AT POWERS OF 2 */
+
+struct StackFast {
+  int top;
+  int capacity;
+  int* array;
+};
+//initialize the stack
+struct StackFast* createStackFast() {
+    struct StackFast* stack = (struct StackFast*)malloc(sizeof(struct StackFast));
+    stack->top = -1;
+    stack->capacity = 1;
+    stack->array = (int*)malloc(stack->capacity * sizeof(int));
+    return stack;
+}
+//empty stack
+int isEmptyFast(struct StackFast* stack) {
+    return stack->top == -1;
+}
+
+void pushFast(struct StackFast* stack, int item) {
+    if (stack->top + 1 == stack->capacity) {
+        stack->capacity *= 2; //power of 2
+        stack->array = (int*)realloc(stack->array, stack->capacity * sizeof(int));
+    }
+    stack->array[++stack->top] = item;
+}
+//remove item
+int popFast(struct StackFast* stack) {
+    if (isEmptyFast(stack)) {
+        fprintf(stderr, "Error: Stack underflow\n");
+        exit(1);
+    }
+    int item = stack->array[stack->top--];
+    if (stack->top + 1 > 0 && stack->top + 1 == stack->capacity / 4) {
+        stack->capacity /= 2;
+        stack->array = (int*)realloc(stack->array, stack->capacity * sizeof(int));
+    }
+    return item;
+}
+
+//Quiz5

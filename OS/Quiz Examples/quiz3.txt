@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Check if the correct number of arguments is provided
+if [ "$#" -ne 2 ]; then
+  echo "Usage: $0 <usernames_file> <filename>"
+  exit 1
+fi
+
+# Assign arguments to variables
+usernames_file="$1"
+filename="$2"
+
+# Check if the usernames file exists
+if [ ! -f "$usernames_file" ]; then
+  echo "Error: Usernames file '$usernames_file' not found!"
+  exit 1
+fi
+
+# Read each username from the usernames file
+while IFS= read -r username; do
+  # Skip empty lines and comments (if any)
+  if [ -z "$username" ] || [[ "$username" == \#* ]]; then
+    continue
+  fi
+
+  # Construct the user's home directory path
+  home_dir="/home/$username"
+
+  # Check if the home directory exists and is accessible
+  if [ ! -d "$home_dir" ]; then
+    echo "Error: Home directory for user '$username' does not exist."
+    continue
+  elif [ ! -r "$home_dir" ]; then
+    echo "Permission denied for user '$username'. Home directory is not accessible."
+    continue
+  fi
+
+  # Construct the full path to the file
+  file_path="$home_dir/$filename"
+     echo ""
+     echo "$username"
+      echo "#############"
+  # Check if the file exists
+  if [ -f "$file_path" ]; then
+    # If file exists, get the file size
+    file_size=$(stat -c%s "$file_path")
+    echo "$filename : File found, size $file_size bytes"
+  elif [ -e "$file_path" ]; then
+    # The file exists but is not a regular file
+    echo " $filename : The file exists but is not a regular file."
+  else
+    # The file does not exist
+    echo " $filename : File not found"
+  fi
+done < "$usernames_file"

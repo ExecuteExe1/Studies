@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Check if a 4-digit integer is provided as input
+if [[ $# -ne 1 || ! $1 =~ ^[0-9]{4}$ ]]; then
+ 
+  exit 1
+fi
+
+# Assign input to a variable
+input=$1
+
+# Compute SHA-256 hash of the input
+hash=$(echo -n "$input" | sha256sum | awk '{print $1}')
+
+# Save the output to hash_output.txt
+echo "Input: $input" > hash_output.txt
+echo "Hash: $hash" >> hash_output.txt
+
+# Display success message
+echo "Hash saved in hash_output.txt"
+

@@ -1,0 +1,2 @@
+Input: 7683
+Hash: ad34ae8e887be8a66fa0a7956f24fb4392efafff5a1dc98cd1d094ab5b5404c9
