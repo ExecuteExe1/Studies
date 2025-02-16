@@ -1,0 +1,60 @@
+#! /bin/bash
+#calculation of my N through my aem
+ MyAem=0
+ os=(1 0 8 5 2)
+ for i in 0 1 2 3 4
+ do
+   MyAem=$(( MyAem + os[i] ))
+ if [ $MyAem -gt 10 ]; then
+  MyAem=$(( (MyAem % 10) + ( MyAem / 10) ))
+ fi
+done
+
+  echo "My number is: $MyAem"
+
+N=$MyAem
+
+#Numbers of files i want to create
+
+NUM_FILES=$((10 + N))
+
+ #generates random word from lowercase a to z ,from 6 to 8 characters
+
+randomword=$(tr -dc 'a-z' </dev/urandom | head -c $((RANDOM % 3 + 6)))
+
+#vector of the needed words
+WORDS=("super" "spider" "bat")
+
+#we generate all the 10+N files
+for ((i=1; i<=NUM_FILES; i++)); do
+  filename="${randomword}-${i}.txt"
+  echo "Created File : $filename"
+
+  #we fill these files with random N+10 words from our vector{that's why we have 3 fors!}
+  TOTAL_WORDS=$((N + 10))
+  for ((j=0; j<TOTAL_WORDS; j++)); do
+    random_word=${WORDS[RANDOM % ${#WORDS[@]}]}
+    echo -n "$random_word " >> "$filename"
+  done
+  echo "" >> "$filename"  
+done
+
+#create my path so that i can go ot each file and search fro the words
+username=$(whoami)
+report_path="/home/$username/Studies/Practise_forexams/report.txt"
+
+> "$report_path"
+#get number of words
+for ((i=1; i<=NUM_FILES; i++)); do
+  filename="${randomword}-${i}.txt"
+  count_super=$(grep -o 'super' "$filename" | wc -l)
+  count_spider=$(grep -o 'spider' "$filename" | wc -l)
+  count_bat=$(grep -o 'bat' "$filename" | wc -l)
+
+ #write into the report file the number of words
+  echo "/home/fotekokk/Studies/Practise_forexams/$filename" >> "$report_path"
+  echo " $count_super super" >> "$report_path"
+  echo " $count_spider spider" >> "$report_path"
+  echo " $count_bat bat" >> "$report_path"
+  echo "" >> "$report_path"  
+done

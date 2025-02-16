@@ -1,0 +1,85 @@
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-1.txt
+ 5 super
+ 7 spider
+ 5 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-2.txt
+ 6 super
+ 8 spider
+ 3 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-3.txt
+ 7 super
+ 4 spider
+ 6 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-4.txt
+ 4 super
+ 6 spider
+ 7 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-5.txt
+ 10 super
+ 2 spider
+ 5 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-6.txt
+ 7 super
+ 4 spider
+ 6 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-7.txt
+ 7 super
+ 5 spider
+ 5 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-8.txt
+ 4 super
+ 8 spider
+ 5 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-9.txt
+ 8 super
+ 4 spider
+ 5 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-10.txt
+ 8 super
+ 5 spider
+ 4 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-11.txt
+ 5 super
+ 7 spider
+ 5 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-12.txt
+ 1 super
+ 9 spider
+ 7 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-13.txt
+ 10 super
+ 3 spider
+ 4 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-14.txt
+ 7 super
+ 6 spider
+ 4 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-15.txt
+ 5 super
+ 2 spider
+ 10 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-16.txt
+ 8 super
+ 3 spider
+ 6 bat
+
+/home/fotekokk/Studies/Practise_forexams/rmuhixc-17.txt
+ 8 super
+ 2 spider
+ 7 bat
+
