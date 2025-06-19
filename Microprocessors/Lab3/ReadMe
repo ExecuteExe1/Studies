@@ -1,0 +1,19 @@
+1.Startup of the system:User must input a password
+ 1.1If password is wrong display Error message then ask again for the password
+ 1.2If password is right proceed to Enter your AEM{Student Id Number}
+2.Menu Initialisation
+ Uart Displays:
+ a:Increase of reading frequency and printing by 1sec(minimum 2s)
+ b:Decrease of reading frequency and printing by 1sec(maximum 10s)
+ c:Change between Display Modes(Temperature/Humidity/Both)
+ d:Printing of the latest values and the status of the system
+ The Menu inputs can be inserted into the uart at any time!
+
+3.Modes (switch between them with a simple button press)
+ 3.1Mode A The system reads and prints the Temperature and Humidity according to the User's settings
+ 3.2Mode B The system keeps reading and printing BUT if Temp reaches above 25% OR Humidity reaches above 60% Led starts blinking every 1sec
+  3.2.2 In Mode B if the values return to normal the led keeps blinking for the first 5 readings/printings.Then it turns off
+
+4.Dynamic change of frequency.Every 3rd time the button is pressed  there will be a new reading/printing frequency which will be the 2 last digits of the AEM added. F.e Aem=10852 then the new freq=7
+5.UART Status Command:When status is inserted into the UART the system prints: "{Current Mode},{Last Temp/Humidity values},{Numbers of Mod swaps}"
+6.Panic reset: If Temp>35% and Humidity>80% after 3 readings that violate the normal conditions the system has a software reset and prints a message!
