@@ -1,0 +1,17 @@
+1.Number Input F.e(52719)
+2.Analysis of each digit:
+ Analysis of each digit takes 0.5 seconds
+ 2.1If number is even then Led blinks for 200ms(200ms on,200ms off)
+ 2.2If number is odd Led just ~ its current state(if on ,then it turns off.If off,then it turns on)
+3.Interrupt from Button press!
+ 3.1Led Freezes(State remains unchanged)
+ 3.2Prints "Button pressed.Led locked.Count=x" and Count = the number of button presses since the start
+ 3.3The numeric analysis continues in Uart but without any Led acivities
+ 3.4UartvsButton-->Button press has higher priority
+4.Exit from the Freeze state--> second press of the button
+5.New number Input!
+ 5.1When the Analysis is complete we ask for another number
+ 5.2The user can ANY time of the analysis to JUST input a new number
+  5.2.1The running analysis STOPS immediately
+  5.2.2Starts a new numeric analysis from the start
+                                                  
