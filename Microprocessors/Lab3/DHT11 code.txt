@@ -1,0 +1,98 @@
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include "delay.h"
+#include "gpio.h"
+#include "leds.h"
+#include "platform.h"
+#include "queue.h"
+#include "timer.h"
+#include "uart.h"
+
+#define BUFF_SIZE 128 // Read Buffer Length
+#define PASSWORD "1234" //our password
+#define AEM_LENGTH 8 //Aem
+// Additional Define Instructions
+unsigned int option=0;
+Queue Rx_Queue; // Queue For Storing Received Characters
+unsigned int Tick = 0;
+uint32_t Current_Index = 0;
+
+#define Sensor PA_0  // We use an analog pin {dokimasa Digital k den leitourgouse....eimai clown)
+
+uint8_t sensor_data[5];
+
+void sensor_start_signal() {
+    gpio_set_mode(Sensor, Output);//we need to set it as an output {opws k se ena ledaki}
+    gpio_set(Sensor,1); // pull high initially
+    delay_ms(1);          //edw prepei na xwsoume sigoura timer kai na kanoume synchronization.....
+    gpio_set(Sensor, 0); // pull low for at least 18ms
+    delay_ms(20);           //evala delay gia testing/debugging
+    gpio_set(Sensor, 1); // pull high for 20-40us
+    delay_us(30);
+    gpio_set_mode(Sensor, Input);  //
+}
+
+bool sensor_check_response() {
+    delay_us(40);
+    if (gpio_get(Sensor) == 0) {
+        delay_us(80);
+        if (gpio_get(Sensor) == 1) {
+            delay_us(50);
+            return true;
+        }
+    }
+    return false;
+}
+
+uint8_t sensor_read_byte() {
+    uint8_t i, byte = 0;
+    for (i = 0; i < 8; i++) {
+        while (gpio_get(Sensor) == 0);  // wait for low
+        delay_us(30);                    // wait to read bit value
+        if (gpio_get(Sensor))
+            byte |= (1 << (7 - i));
+        while (gpio_get(Sensor));       // wait for high to finish
+    }
+    return byte;
+}
+
+bool sensor_read(uint8_t *humidity, uint8_t *temperature) {
+    sensor_start_signal();
+    if (!sensor_check_response())
+        return false;
+
+    for (int i = 0; i < 5; i++)
+        sensor_data[i] = sensor_read_byte();
+
+    uint8_t checksum = sensor_data[0] + sensor_data[1] + sensor_data[2] + sensor_data[3];
+    if (checksum != sensor_data[4])
+        return false;
+
+    *humidity = sensor_data[0];
+    *temperature = sensor_data[2];
+    return true;
+}
+
+int main(void) {
+    uart_init(115200);
+    uart_enable();
+  
+
+    uart_print("DHT11 Sensor Init...\r\n");
+
+    uint8_t temp, hum;
+    char buffer[64];
+
+    while (1) {
+        if (sensor_read(&hum, &temp)) {
+            sprintf(buffer, "Temp: %d°C, Hum: %d%%\r\n", temp, hum);
+            uart_print(buffer);
+        } else {
+            uart_print("DHT11 read failed.\r\n");
+        }
+
+        delay_ms(1000); // Wait 1 second
+    }
+}

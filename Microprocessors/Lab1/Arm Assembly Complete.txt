@@ -1,0 +1,144 @@
+
+.global strhash
+.p2align 2
+.type strhash, %function
+
+strhash:
+.fnstart
+	MOV		R4, #0    //Initialise R4=0
+calcLenLoop:
+LDRB	R5, [R0, R4]    //Load Byte in R5(Destination register where the byte will be stored) from address--->,R0 is the starting address and R4 the offset added to R0 {and saves into the next address from R0+R4)
+	CMP		R5, #0     //Compares the R5 value to 0
+	BEQ		calcLenLoopExit  //if Branch Equal to 0 then we go to label CalcLenLoopExit{exiting loop}
+	ADD		R4, R4, #1   //Increment R4 by one cause it basically counts the lenght of the string 
+	B		calcLenLoop  //Goes back to the Label calcLenLoop until we "read" the whole string
+calcLenLoopExit:
+	MOV		R6, #0  //initialize R6=0
+	MOV		R7, R4  //Move the R4 value into R7 {R7=R4} (we will use this register to hold the final value(164))
+forLoop:             //code continues and proceeds to this label
+    CMP		R6, R4   //Compares R6 value with R4 {like an if condition it checks if the R6 = R4 (R4 holds the number of elements of our string)}
+	BGT		forLoopExit //if R6=0 then we jump into the forLoopExit label
+	LDRB	R5, [R0, R6]  //Loads Byte in R5(Destination register where the byte will be stored) from address -->R0 is the starting address and R6 the offset added to R0 
+	CMP		R5, #48      //Compares the Value of R5 (this is the start of our "detection" for numbers)
+	BLT		forLoopExit  //Branch Less Than 48 we jump into the forLoopExit label (we basically check if r5 is NOT a number nor a letter {bellow 48} then it procceeds to that label)
+	CMP		R5, #57      //Compare R5 value to 57
+	BGT		forLoopElseIf1 //Branch Greater than  which means if R5 is greater than 57 then we have a letter so we jump into label forLoopElseIf1
+	CMP		R5, #48        //Compare R5 value to 48 (from now on if we have to deal with a number our code this far has bypassed the label jumps and now we make comparisons to basically put the desired values of the table given in the pdf depending on the number we are currently dealing with on the string
+	IT		EQ            //Required It {condition} block to be abble to run our ADDEQ instruction
+	ADDEQ	R7, R7, #5  //if R5=48 then R7=R7+5 (if R5 is 48 then it's the number 0 and we add the desired value from the table given to us} 
+	CMP		R5, #49         //Compare R5 value to 49 
+	IT		EQ             //Required It {condition} block to be abble to run our ADDEQ instruction
+	ADDEQ	R7, R7, #12  //if R5=49 then R7=R7+12(if R5 is 49 then it's the number 1 and we add the desired value from the table given to us} 
+	CMP		R5, #50         //Compare R5 value to 50 
+	IT		EQ             //Required It {condition} block to be abble to run our ADDEQ instruction
+	ADDEQ	R7, R7, #7   //if R5=50 then R7=R7+7 (if R7 is 50 then it's the number 2 and we add the desired value from the table given to us} 
+	CMP		R5, #51       //Compare R5 value to 51
+	IT		EQ           //Required It {condition} block to be abble to run our ADDEQ instruction
+	ADDEQ	R7, R7, #6   //if R5=51 then R7=R7+6 (if R5 is 51 then it's the number 3 and we add the desired value from the table given to us} 
+	CMP		R5, #52       //Compare R5 value to 52
+	IT		EQ           //Required It {condition} block to be abble to run our ADDEQ instruction
+	ADDEQ	R7, R7, #4  //if R5=52 then R7=R7+4 (if R5 is 52 then it's the number 4 and we add the desired value from the table given to us} 
+	CMP		R5, #53         //Compare R5 value to 53
+	IT		EQ             //Required It {condition} block to be abble to run our ADDEQ instruction
+	ADDEQ	R7, R7, #11   //if R5=53 then R7=R7+11(if R5 is 53 then it's the number 5 and we add the desired value from the table given to us} 
+	CMP		R5, #54         //Compare R5 value to 54 
+	IT		EQ             //Required It {condition} block to be abble to run our ADDEQ instruction
+	ADDEQ	R7, R7, #6    //if R5=54 then R7=R7+6(if R5 is 54 then it's the number 6 and we add the desired value from the table given to us} 
+	CMP		R5, #55         //Compare R5 value to 55 
+	IT		EQ             //Required It {condition} block to be abble to run our ADDEQ instruction
+	ADDEQ	R7, R7, #3    //if R5=55 then R7=R7+3 (if R5 is 55 then it's the number 7 and we add the desired value from the table given to us} 
+	CMP		R5, #56        //Compare R5 value to 56 
+	IT		EQ            //Required It {condition} block to be abble to run our ADDEQ instruction
+	ADDEQ	R7, R7, #10  //if R5=56 then R7=R7+10(if R5 is 56 then it's the number 8 and we add the desired value from the table given to us} 
+	CMP		R5, #57        //Compare R5 value to 57 
+	IT		EQ            //Required It {condition} block to be abble to run our ADDEQ instruction
+	ADDEQ	R7, R7, #23  //if R5=57 then R7=R7+23(if R5 is 57 then it's the number 9 and we add the desired value from the table given to us} 
+	ADD		R6, R6, #1   //Now we increment our R6 to "SHOW"/"point" at the next element on our string
+	B		forLoop     //Branches back to loop till R6=R4
+forLoopElseIf1:         //Our first loop about letters,2 categories,uppercase,lowercase
+    CMP		R5, #65     //Compares R5 to value 65{A}
+	BLT		forLoopExit  //Branch Less than 65 jumps to the forLoopExit label (This means that the element is NOT a letter(from A to Z(upper and lower case) nor a number since we are here)
+	CMP		R5, #90          //Compares R5 to value 90{Z}
+	BGT		forLoopElseIf2   //Branch Greater than 90{Z} jumps to the forLoopElseIf2 which means the element is NOT an uppercase letter
+	LSL		R8, R5, #1       //The code reaches this point if the letter belongs to the uppercase ones (65 to 90) so we procceed to R8=R8*2 by doing LogicShiftLeft  so f.e if we have 01000001 the value of R8 will be  10000010
+	ADD		R7, R7, R8       //We add the result in our R7 register 
+	ADD		R6, R6, #1       //We increment our R6 register to "point" to the next element
+	B		forLoop         //Branching back to forLoop until we are done reading the string
+forLoopElseIf2:             //Label for lowercase letters
+CMP		R5, #97         //Compare value R5=97{a}
+	BLT		forLoopExit     //Branch Less than 97 then jump to forLoopExit label (R5 element is NOT a number,nor a letter of lower or upper case)
+	CMP		R5, #122       //compare value R5=122{z}
+	BGT		forLoopExit    //Branch Greater Than 122 then jump to label forLoopExit (This means R5 is another symbol, NOT a number,nor a letter of lower or upper case)
+	SUB		R8, R5, #97    //if the element is indeed a lowercase letter the code reaches here and does R8=R5-97{distance of our letter from 97{a}})
+	MUL		R8, R8, R8     //We wanted to basically do (distance)^2 so we took the instruction from above ^ and this one
+	ADD		R7, R7, R8     //We add our result in R7 register
+	ADD		R6, R6, #1    //We increment our R6 to "point" to the next element of our string
+	B		forLoop    //Branching back to forloop etc etc
+forLoopExit:
+ 	MOV		R0, R7   //We move the final result of our labels/code to R0 register
+	CMP		R0, #9  //we compare R0 with 9
+	BLE		strHashEnd //Branch if Less Than or Equal then we jump to strHashEnd (We want to check if our result is less than nine then we continue the solution to the problem (add the numbers individually f.e 164 1+6+4=11)
+digitSum:
+    MOV		R4, R0   //move{"copy"} the value of our results to R4 , R4=R0
+	MOV		R5, #0  //Initialize our R5=0
+	digitSum1000:       //"dividing" our number in "sections" (thousands,hundres,dozens,units)
+	CMP		R4, #1000    //Compare R4 to 1000
+	BLT		digitSum100   //Branch Less than 1000 then jump to DigitSum100 Which means our value is smaller than 1000 so we have no thousands
+	SUB		R4, R4, #1000  //We substract 1000 so that we can be left with the rest (if we have f.e value 2300 we will "enter" digitSum1000 twice since we have 2 thousands)
+	ADD		R5, R5, #1    //We increment our R5 by 1 (counts our thousands)
+	B		digitSum1000   //Branching back to digitSum1000
+digitSum100:               
+	CMP		R4, #100        //Compare R4 to 100
+	BLT		digitSum10      //Branch Less than 100 then jump to DigitSum10 Which means our value is smaller than 100 so we have no hundres
+	SUB		R4, R4, #100     //We substract 100 so that we can be left with the rest (if we have f.e value 300 we will "enter" digitSum1000 thrice since we have 3 hundreds)
+	ADD		R5, R5, #1      //We increment our R5 by 1 (counts our hundreds)
+	B		digitSum100      //Branching back to digitSum100
+digitSum10:
+	CMP		R4, #10          //Compare R4 to 10
+	BLT		digitSum1        //Branch Less than 10 then jump to DigitSum1 Which means our value is smaller than 10 so we have no dozens
+	SUB		R4, R4, #10       //We substract 10 so that we can be left with the rest (if we have f.e value 20 we will "enter" digitSum10 twice since we have 2 dozens)
+	ADD		R5, R5, #1       //We increment our R5 by 1 (counts our dozens)
+	B		digitSum10        //Branching back to digitSum10
+digitSum1: 
+	CMP		R4, #1       //Compare R4 to 1
+	BLT		digitSumEnd  //Branch Less than 1 then jump to digitSumEnd Which means our value is smaller than 1 so we have no units
+	SUB		R4, R4, #1    //We substract 1 so that we can be left with the rest (if we have f.e value 4 we will "enter" digitSum1 four times since we have 4 units)
+	ADD		R5, R5, #1   //We increment our R5 by 1 (counts our units)
+	B		digitSum1     //Branching back to digitSum1
+digitSumEnd:
+	MOV		R0, R5    //We move our final result of added thousands,hundreds,dozens and simple units to R0
+	CMP		R0, #9    //Compare the result to 9
+	BLE		strHashEnd  //Branch if Less Than or Equal jump to strHashEnd to wrap things up
+successiveSubtract:        //time to do the resultmod7
+	SUB		R0, R0, #7  //we substract 7 from our result 
+	CMP		R0, #7     //Compare the value of R0 to 9
+	BGT		successiveSubtract  //Branch Greater Than jump to successiveSubtract which means if our result-7 is more than 7 we repeat the proccess
+strHashEnd:
+	NOP       //does nothing
+fibonacci:    //Fibonacci time! (We know that fib(n)=fib(n-1)+fib(n-2)
+	PUSH	{LR}    //Save our Link Register
+	CMP		R0, #0  //Compare R0(result from our previous operations) to 0
+	BEQ		fibonacciZero //Branch Equal jump to FibonacciZero , if R0=0 then we got fib(0)
+	CMP		R0, #1       //Compare R0 to 1 
+	BEQ		fibonacciOne  //Branch Equal jump to FibonacciOne,if R0=1 then we got fib(1)
+	SUB		R0, R0, #1   //Here we preper to do the fib(n-1) so we substract 1 from our "n"(in our case our R0)
+	PUSH	{R0, LR}   //We save our original R0 value and our Link Register cause we are about to call a recursive? function so we have to Save the original value of our R0
+	BL		fibonacci //We call the fibonacci with our R0 being basically the n-1 ( f.e let;s say we got fib(4)=fib(3)+fib(2)   we calculate fib(3) which is constructed of fib(2) and fib(1) so the function will re-run and call fib(2) first which will call fib(1) and fib(0) since it is constructed by these 2, then when finished our R0 will call fibonacci again for n-2 in our case our R0=3 will now be R0=1 when calling the second fibonacci
+	MOV		R1, R0   //we move the result of our first fibonacci(n-1) call into R1
+	POP		{R0, LR}  //We return our original values of R0 and LR
+	SUB		R0, R0, #1 //Substract 1 to create n-2
+	PUSH	{R1, LR} //Save our original values again of R1 this time
+	BL		fibonacci //We call the second fibonacci (fib(n-2) which in our case calls fib(2) which is constructed of fib(1) and fib(0) so we run fibonaci ,we get and R0 return from fibonacciOne and then fib(1) calls fib(0) which returns 0, then fib(2) proceeds to call fib(0) which also gets 0 so fib(2) returns a total value of R0=1
+ 	POP		{R1, LR}  //We return the original values of the R1 and LR
+	ADD		R0, R0, R1  //We add  the result of fib(3)(R1) and the result of fib(2)(R0)
+	POP		{LR}  //We have one final pop of LR since we had a PUSH in the start of our current running function (basically loads data from the top of the stack into LR)
+	BX		LR //Branch and Exchange that jumps to the addressed stored in the LR 
+fibonacciZero:
+	MOV		R0, #0 //fib(0)=0
+	POP		{LR}  // we load data from the top of the stack into LR since wwe are currently running this function (whichever function runs it's on the top of the stack)
+	BX		LR  //Branch and Exchange that jumps to the addressed stored in the LR
+fibonacciOne:
+	MOV		R0, #1  //fib(1)=1
+	POP		{LR}  // we load data from the top of the stack into LR since we are currently running this function
+	BX		LR  //Branch and Exchange that jumps to the addressed stored in the LR
+.fnend  //end!

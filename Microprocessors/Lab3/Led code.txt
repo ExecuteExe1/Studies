@@ -1,0 +1,14 @@
+int main(void){
+	
+		leds_init(); // Initialize LEDs
+	  leds_set(0, 0, 0); // Set LEDs (RGB)
+	  __enable_irq();
+	  gpio_set_mode(Led_Pin, Output);
+	while(1){
+	  gpio_toggle(Led_Pin);	
+		delay_ms(300);		
+		gpio_toggle(Led_Pin);
+		delay_ms(100);
+	
+}
+	}
