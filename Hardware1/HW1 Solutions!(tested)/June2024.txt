@@ -1,0 +1,236 @@
+15-1Mux with the use of 2 8-1Mux 
+
+Code
+module mux8to1(
+    input [7:0] D,
+    input [2:0] S,
+    output Y
+);
+    assign Y = (S == 3'b000) ? D[0] :
+               (S == 3'b001) ? D[1] :
+               (S == 3'b010) ? D[2] :
+               (S == 3'b011) ? D[3] :
+               (S == 3'b100) ? D[4] :
+               (S == 3'b101) ? D[5] :
+               (S == 3'b110) ? D[6] : D[7];
+endmodule
+
+
+module mux15to1(
+    input [14:0] inp,
+    input [3:0] sel,
+    output Y
+);
+
+    wire Y1, Y2;
+    wire [7:0] mux2_inputs;
+    
+    assign mux2_inputs = {1'b0, inp[14:8]}; // D7=0, D6=inp[14], ..., D0=inp[8]
+    
+    mux8to1 mux1 (.D(inp[7:0]), .S(sel[2:0]), .Y(Y1));
+    mux8to1 mux2 (.D(mux2_inputs), .S(sel[2:0]), .Y(Y2));
+    
+    assign Y = (sel[3] == 1'b0) ? Y1 : Y2;
+
+endmodule
+
+
+testbench
+
+`timescale 1ns/1ps
+
+module tb_mux15to1;
+
+    reg [14:0] inp;
+    reg [3:0]  sel;
+    wire Y;
+
+    // DUT instantiation
+    mux15to1 uut (
+        .inp(inp),
+        .sel(sel),
+        .Y(Y)
+    );
+
+    // Task for checking expected output
+    task check_output;
+        input [14:0] in_val;
+        input [3:0]  sel_val;
+        reg expected;
+        begin
+            if (sel_val < 15)
+                expected = in_val[sel_val];
+            else
+                expected = 1'b0; // default case (since only 15 inputs)
+            
+            if (Y !== expected) begin
+                $display("ERROR: inp=%b sel=%d -> Y=%b (expected %b)", 
+                          in_val, sel_val, Y, expected);
+            end else begin
+                $display("PASS : inp=%b sel=%d -> Y=%b", 
+                          in_val, sel_val, Y);
+            end
+        end
+    endtask
+
+    initial begin
+        // Initialize
+        inp = 15'b0;
+        sel = 4'b0;
+
+        // Test each select value with random inputs
+        repeat (10) begin
+            inp = $random;
+            for (sel = 0; sel < 16; sel = sel + 1) begin
+                #5; // wait for signals to settle
+                check_output(inp, sel);
+            end
+        end
+
+        $display("All test cases completed.");
+        $finish;
+    end
+
+endmodule
+
+3το θεμα:
+
+module fsm_controller(
+    input clk,
+    input rst_n,
+    input X,
+    output reg Y
+);
+
+    // Καθορισμός καταστάσεων
+    parameter IDLE  = 3'b000;
+    parameter OUT1  = 3'b001;
+    parameter OUT2  = 3'b010;
+    parameter OUT3  = 3'b011;
+    parameter WAIT1 = 3'b100;
+    parameter WAIT2 = 3'b101;
+
+    // Εσωτερικές μεταβλητές
+    reg [2:0] current_state, next_state;
+    reg X_prev; // για ανίχνευση rising edge
+
+    // Ανίχνευση rising edge της X
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            X_prev <= 1'b0;
+        else
+            X_prev <= X;
+    end
+
+    wire X_rise = X && !X_prev;
+
+    // Ασύγχρονος μηδενισμός και αλλαγή κατάστασης
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            current_state <= IDLE;
+        else
+            current_state <= next_state;
+    end
+
+    // Λογική επόμενης κατάστασης
+    always @(*) begin
+        case (current_state)
+            IDLE: begin
+                if (X_rise)
+                    next_state = OUT1;
+                else
+                    next_state = IDLE;
+            end
+            
+            OUT1: next_state = OUT2;
+            OUT2: next_state = OUT3;
+            OUT3: next_state = WAIT1;
+            WAIT1: next_state = WAIT2;
+            WAIT2: next_state = IDLE;
+            
+            default: next_state = IDLE;
+        endcase
+    end
+
+    // Λογική εξόδου
+    always @(*) begin
+        case (current_state)
+            IDLE:  Y = 1'b0;
+            OUT1:  Y = 1'b1;
+            OUT2:  Y = 1'b1;
+            OUT3:  Y = 1'b1;
+            WAIT1: Y = 1'b0;
+            WAIT2: Y = 1'b0;
+            default: Y = 1'b0;
+        endcase
+    end
+
+endmodule
+
+Testbench
+
+`timescale 1ns/1ps
+
+module tb_fsm_controller();
+    reg clk;
+    reg rst_n;
+    reg X;
+    wire Y;
+    
+    // Δημιουργία ρολογιού
+    always #5 clk = ~clk;
+    
+    // Στιγμιότυπο της μηχανής
+    fsm_controller uut (
+        .clk(clk),
+        .rst_n(rst_n),
+        .X(X),
+        .Y(Y)
+    );
+    
+    // Αρχικοποίηση
+    initial begin
+        clk = 0;
+        rst_n = 0;
+        X = 0;
+        
+        // Εφαρμογή reset
+        #10 rst_n = 1;
+        
+        // Δοκιμή 1: Rising edge της X
+        #10 X = 1; // Rising edge
+        #100;
+        
+        // Δοκιμή 2: Άλλο rising edge ενώ η μηχανή είναι απασχολημένη
+        #10 X = 0;
+        #10 X = 1; // Αυτό το rising edge θα αγνοηθεί
+        #50;
+        
+        // Δοκιμή 3: Rising edge μετά το πέρας του κύκλου
+        #10 X = 0;
+        #50 X = 1; // Αυτό το rising edge θα γίνει αποδεκτό
+        #100;
+        
+        // Δοκιμή 4: Reset κατά τη λειτουργία
+        #10 rst_n = 0;
+        #20 rst_n = 1;
+        
+        #50 $finish;
+    end
+    
+    // Παρακολούθηση των σημάτων
+    initial begin
+        $monitor("Time=%0t, State=%b, X=%b, Y=%b", 
+                 $time, uut.current_state, X, Y);
+    end
+    
+    // Δημιουργία αρχείου VCD για προσομοίωση
+    initial begin
+        $dumpfile("fsm_controller.vcd");
+        $dumpvars(0, tb_fsm_controller);
+    end
+    
+endmodule
+
+
+

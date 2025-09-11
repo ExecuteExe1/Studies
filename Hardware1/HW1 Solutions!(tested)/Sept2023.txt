@@ -1,0 +1,207 @@
+2)γ) Structural code:
+module Sept2023(input a,input b,input c,input d,input e,input f,output z);
+ 
+wire w1,w2,w3,w4;
+  assign w1=~(a&b);
+  assign w2=~(c&d);
+  assign w3=~(w1&w2&(~e));
+  assign w4=~(w3&f);
+  assign z=~w4;
+endmodule
+
+Testbench
+`timescale 1ns/1ps
+
+module tb_Sept2023;
+
+        reg a,b,c,d,e,f;
+    wire z;
+    // Instantiate the DUT (Device Under Test)
+  Sept2023 dut ( 
+    .a(a),
+    .b(b),
+    .c(c),
+    .d(d),
+    .e(e),
+    .f(f),
+    .z(z)
+  );
+
+     integer i;
+    reg expected_z;
+    integer pass_count = 0;
+    integer fail_count = 0;
+    
+    initial begin
+        // Print header
+        $display("TEST CASES FOR Sept2023 MODULE");
+        $display("==============================");
+        $display("Case\t a b c d e f | z (actual) | z (expected) | Status");
+        $display("--------------------------------------------------------");
+        
+        // Apply all 64 test cases
+        for (i = 0; i < 64; i = i + 1) begin
+            {a, b, c, d, e, f} = i;
+            #10;
+            
+            // Calculate expected output
+            expected_z = f & ( (a & b) | (c & d) | e );
+            
+            // Check if output matches expected
+            if (z !== expected_z) begin
+                $display("%3d\t %b %b %b %b %b %b |     %b      |      %b       | ERROR", 
+                         i, a, b, c, d, e, f, z, expected_z);
+                fail_count = fail_count + 1;
+            end else begin
+                $display("%3d\t %b %b %b %b %b %b |     %b      |      %b       | OK", 
+                         i, a, b, c, d, e, f, z, expected_z);
+                pass_count = pass_count + 1;
+            end
+        end
+        
+        // Print summary
+        $display("\nSUMMARY:");
+        $display("=========");
+        $display("Total test cases: 64");
+        $display("Passed: %0d", pass_count);
+        $display("Failed: %0d", fail_count);
+        
+        if (fail_count == 0) begin
+            $display("\nAll test cases passed! ✓");
+        end else begin
+            $display("\nSome test cases failed! ✗");
+        end
+        
+        $finish;
+    end
+endmodule
+
+2)δ)Behavioural code:
+
+module Sept2023b(input a,input b,input c,input d,input e,input f,output z);
+     assign z = f & ((a & b) | (c & d) | e);
+endmodule
+
+
+Same testbench
+
+3)
+
+Code FSM mealy
+
+module MealyFSM(input x,input rst,input clk,output reg y);
+  parameter S0=2'b00;
+  parameter S1=2'b01;
+  parameter S2=2'b10;
+  parameter S3=2'b11;
+  reg [1:0] current_state,next_state;
+  always@(posedge clk or negedge rst)begin
+    if(rst)begin
+      current_state<=S0;
+    end else begin
+       current_state<=next_state;
+  end
+  end
+  always@(*)begin
+   next_state=current_state;
+       y=1'b0;
+    case(current_state)
+      S0:begin 
+        case(x)
+          2'b00:begin next_state=S1; y=1;end
+          2'b01:next_state=S2;
+           default next_state=S0;
+          endcase
+        end
+      S1:begin
+        case(x) 
+          2'b00:next_state=S2;
+          2'b01:begin next_state=S3;y=1; end
+          default next_state=S1;
+        endcase
+       end
+      S2:begin
+        case(x)
+          2'b00:next_state=S1;
+          2'b01:begin next_state=S3;y=1; end
+        default next_state=S2;
+        endcase
+       end
+      S3:begin
+        case(x)
+          2'b00:begin next_state=S2;y=1; end
+         2'b01:next_state=S0;
+         default next_state=S0;
+        endcase
+       end
+     default next_state=S0;
+    endcase
+  end
+endmodule
+ 
+
+Testbench
+
+`timescale 1ns/1ps
+
+module tb_MealyFSM;
+
+       reg x,rst,clk;
+      wire y;
+    // Instantiate the DUT (Device Under Test)
+  MealyFSM dut ( 
+    .x(x),
+    .rst(rst),
+    .clk(clk),
+    .y(y)
+  );
+
+     always #5 clk = ~clk;
+
+    initial begin
+        clk=0;
+        rst=0;
+        x=0;
+      
+      $display("\n Reset the FSM");
+       rst=1;
+       #10
+       rst=0;
+       #10
+
+      $display("\nTest 2: Sequence 00 -> 01 -> 11 -> 10->11->00");
+         x=0;#10 //to S1
+         x=1;#10  //to S3
+         x=0;#10  //to S2
+         x=1;#10  //to S3
+         x=1;#10 //to S0
+
+    $display("\nTest 3: Reset and test sequence 01 -> 00 -> 01");
+       rst=1;#10 //reset state to S0
+       rst=0;#10 //no reset
+       x=1;#10 //to S2
+       x=0;#10 //to S1
+       x=1;#10 //to S3
+       x=0;#10 //to S2
+       x=1;#10 //to S3
+
+      $display("\nTest 4: Invalid inputs");
+        rst = 1; #10;
+        rst = 0; #10;
+        x = 1'bx; #10; // Invalid input, should stay in S0
+        x = 0; #10;    // Valid input
+         $display("\nSimulation completed!");
+        $finish;
+    end
+
+  // Add a monitor to see the results
+    always @(posedge clk) begin
+        $display("Time=%0t: x=%b, y=%b, State=%b", $time, x, y, dut.current_state);
+    end
+
+
+endmodule
+
+
+
+

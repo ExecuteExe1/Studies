@@ -1,0 +1,202 @@
+2)module Question2(input a,input b,input c,input d,output z);
+ 
+wire w1,w2,w3,w4,w5,w6,w7,w8,w9,w10,w11,w12;
+  and(w1,a,b); 
+  and(w2,c,d);
+  or(w3,w2,a); 
+  and(w12,w3,w1);//w12
+  and(w4,a,b);
+  and(w5,~b,d);
+  or(w6,w5,w4);
+  and(w7,w6,b);//w7
+  and(w8,c,d,b);
+  and(w9,a,b,d);
+  or(w10,w8,w9);
+  not(w11,w10);//w11
+  or(z,w12,w7,w12);
+endmodule
+  
+  Testbench
+
+`timescale 1ns/1ps
+
+module tb_Question2;
+
+     reg a,b,c,d;
+     wire z;
+    // Instantiate the DUT (Device Under Test)
+   Question2 dut  ( 
+    .a(a), 
+    .b(b), 
+    .c(c), 
+    .d(d), 
+    .z(z)
+  );
+
+ integer i;
+    initial begin
+        // Print header
+        $display("a b c d | z");
+        $display("--------|---");
+
+        // Loop through all 16 combinations of a,b,c,d
+        for (i = 0; i < 16; i = i + 1) begin
+            {a,b,c,d} = i; // assign bits of i to a,b,c,d
+            #10;           // wait 10 time units
+            $display("%b %b %b %b | %b", a, b, c, d, z);
+        end
+
+        $finish; // end simulation
+    end
+
+endmodule
+
+
+Thema 4
+
+
+Code:
+module TicketVendingMachine (
+    input wire clk,
+    input wire rst,
+    input wire [1:0] coin,
+    output reg ticket
+);
+
+    // State encoding
+    parameter S0 = 2'b00; // 0.0€
+    parameter S1 = 2'b01; // 0.5€
+    parameter S2 = 2'b10; // 1.0€
+    // State 2'b11 is unused
+    
+    // State register
+    reg [1:0] current_state, next_state;
+    
+    // State register update
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            current_state <= S0;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+    
+    // Next state and output logic
+    always @(*) begin
+        // Default values
+        next_state = current_state;
+        ticket = 1'b0;
+        
+        case (current_state)
+            S0: begin // 0.0€
+                case (coin)
+                    2'b01: next_state = S1; // 0.5€
+                    2'b10: next_state = S2; // 1.0€
+                    default: next_state = S0; // No coin or invalid
+                endcase
+            end
+            
+            S1: begin // 0.5€
+                case (coin)
+                    2'b01: next_state = S2; // 0.5€ -> total 1.0€
+                    2'b10: begin // 1.0€ -> total 1.5€
+                        next_state = S0;
+                        ticket = 1'b1; // Issue ticket
+                    end
+                    default: next_state = S1; // No coin or invalid
+                endcase
+            end
+            
+            S2: begin // 1.0€
+                case (coin)
+                    2'b01: begin // 0.5€ -> total 1.5€
+                        next_state = S0;
+                        ticket = 1'b1; // Issue ticket
+                    end
+                    2'b10: begin // 1.0€ -> total 2.0€
+                        next_state = S0;
+                        ticket = 1'b1; // Issue ticket
+                    end
+                    default: next_state = S2; // No coin or invalid
+                endcase
+            end
+            
+            default: next_state = S0; // Handle unused states
+        endcase
+    end
+
+endmodule
+
+
+TestBench
+
+`timescale 1ns/1ps
+
+module tb_TicketVendingMachine;
+
+       reg clk,rst;
+  reg [1:0] coin;
+   wire ticket;
+    // Instantiate the DUT (Device Under Test)
+   TicketVendingMachine dut ( 
+     .clk(clk), 
+     .rst(rst), 
+     .coin(coin), 
+     .ticket(ticket) 
+  );
+
+ always #5 clk = ~clk;
+    initial begin
+         clk=0;
+          rst=1;
+          coin=2'b00;
+       #10 rst = 0;
+        #10 coin = 2'b01; // First 0.5€
+        #10 coin = 2'b00;
+        #10 coin = 2'b01; // Second 0.5€
+        #10 coin = 2'b00;
+        #10 coin = 2'b01; // Third 0.5€ - should issue ticket
+        #10 coin = 2'b00;
+        
+        // Test case 2: 1€ + 0.5€ coins
+        #20 coin = 2'b10; // 1€
+        #10 coin = 2'b00;
+        #10 coin = 2'b01; // 0.5€ - should issue ticket
+        #10 coin = 2'b00;
+        
+        // Test case 3: Two 1€ coins
+        #20 coin = 2'b10; // First 1€
+        #10 coin = 2'b00;
+        #10 coin = 2'b10; // Second 1€ - should issue ticket
+        #10 coin = 2'b00;
+        
+        // Test case 4: 0.5€ + 1€ coins
+        #20 coin = 2'b01; // 0.5€
+        #10 coin = 2'b00;
+        #10 coin = 2'b10; // 1€ - should issue ticket
+        #10 coin = 2'b00;
+        
+        // Test case 5: Invalid coin followed by valid coins
+        #20 coin = 2'b11; // Invalid coin
+        #10 coin = 2'b00;
+        #10 coin = 2'b01; // 0.5€
+        #10 coin = 2'b00;
+        #10 coin = 2'b10; // 1€ - should issue ticket
+        #10 coin = 2'b00;
+        
+        // End simulation
+        #50 $finish;
+    end
+
+ initial begin
+    $monitor("Time=%0t, State=%b, Coin=%b, Ticket=%b", 
+                 $time, dut.current_state, coin, ticket);
+ end
+ 
+endmodule
+
+
+
+
+
+   

@@ -1,0 +1,216 @@
+Test code for Xor with 2 2-1Mux and 2 NOT gates
+
+module mux2to1(sel, i1, i0, f);
+    input i0, i1, sel;
+    output f;
+    wire nsel, w1, w2;
+
+    not(nsel, sel);
+
+    and(w1, i0, nsel);
+    and(w2, i1, sel);
+    or(f, w1, w2);
+endmodule
+
+module XorTest(input a,input b,input c,output z);
+ wire y;
+  mux2to1 Mux1(a,b,~b,y); 
+  mux2to1 Mux2(y,c,~c,z);
+
+endmodule
+
+TestBench
+`timescale 1ns/1ps
+
+module tb_XorTest;
+
+    reg a, b, c;
+    wire z;
+
+    // Instantiate the DUT (Device Under Test)
+    XorTest uut (
+        .a(a),
+        .b(b),
+        .c(c),
+        .z(z)
+    );
+
+    initial begin
+        $display("A B C | Z");
+        $display("-------------");
+
+        // Try all possible input combinations (3 inputs → 8 cases)
+        a = 0; b = 0; c = 0; #10 $display("%b %b %b | %b", a,b,c,z);
+        a = 0; b = 0; c = 1; #10 $display("%b %b %b | %b", a,b,c,z);
+        a = 0; b = 1; c = 0; #10 $display("%b %b %b | %b", a,b,c,z);
+        a = 0; b = 1; c = 1; #10 $display("%b %b %b | %b", a,b,c,z);
+        a = 1; b = 0; c = 0; #10 $display("%b %b %b | %b", a,b,c,z);
+        a = 1; b = 0; c = 1; #10 $display("%b %b %b | %b", a,b,c,z);
+        a = 1; b = 1; c = 0; #10 $display("%b %b %b | %b", a,b,c,z);
+        a = 1; b = 1; c = 1; #10 $display("%b %b %b | %b", a,b,c,z);
+
+        $finish;
+    end
+
+endmodule
+
+
+
+Thema 4
+1)module Mux2to1 #(
+    parameter width = 8
+)(
+    input  [width-1:0] a,
+    input  [width-1:0] b,
+    input              sel,
+    output reg [width-1:0] z
+);
+
+always @(*) begin
+    case (sel)
+        1'b0: z = a;
+        1'b1: z = b;   // <-- εδώ έβαλα b, για κανονικό MUX
+    endcase
+end
+
+endmodule
+
+TestBench
+
+`timescale 1ns/1ps
+
+module tb_Mux2to1;
+
+    parameter width = 8;
+
+    reg  [width-1:0] a, b;
+    reg  sel;
+    wire [width-1:0] z;
+    // Instantiate the DUT (Device Under Test)
+    Mux2to1 #(.width(width)) uut (
+        .a(a),
+        .b(b),
+        .sel(sel),
+        .z(z)
+    );
+
+    initial begin
+      $display("time sel   a    b    | z");
+        $display("---------------------------------------");
+
+        // Test 1: sel=0 -> expect z=a
+        a = 8'hAA;  // 10101010
+        b = 8'h55;  // 01010101
+        sel = 0;
+        #10 $display("%4t  %b   %h   %h   | %h", $time, sel, a, b, z);
+
+        // Test 2: sel=1 -> expect z=0 (based on your code)
+        sel = 1;
+        #10 $display("%4t  %b   %h   %h   | %h", $time, sel, a, b, z);
+
+        // Test 3: change inputs while sel=0
+        sel = 0;
+        a = 8'hF0;
+        b = 8'h0F;
+        #10 $display("%4t  %b   %h   %h   | %h", $time, sel, a, b, z);
+
+        // Test 4: change inputs while sel=1
+        sel = 1;
+        a = 8'hFF;
+        b = 8'h11;
+        #10 $display("%4t  %b   %h   %h   | %h", $time, sel, a, b, z);
+
+        $finish;
+    end
+
+endmodule
+
+
+2)
+
+module Mux2to1 #(
+    parameter width = 8
+)(
+    input  [width-1:0] a,
+    input  [width-1:0] b,
+    input              sel,
+    output reg [width-1:0] z
+);
+
+always @(*) begin
+    case (sel)
+        1'b0: z = a;
+        1'b1: z = b;   // <-- εδώ έβαλα b, για κανονικό MUX
+    endcase
+end
+
+endmodule
+
+module Mux4to1 #(
+    parameter width = 8
+)(
+    input  [width-1:0] a,
+    input  [width-1:0] b,
+  input  [width-1:0] c,
+  input  [width-1:0] d,
+  input       [1:0]   sel,
+    output reg [width-1:0] z
+);
+  wire [width-1:0] w1,w2;
+  Mux2to1 Mux1(a,b,sel[0],w1);
+  Mux2to1 Mux2(c,d,sel[0],w2);
+  Mux2to1 Mux3(w1,w2,sel[1],z);
+
+endmodule
+
+
+TestBench
+
+`timescale 1ns/1ps
+
+module tb_Mux4to1;
+
+    parameter width = 8;
+  reg  [width-1:0] a, b,c,d;
+  reg  [1:0]sel;
+    wire [width-1:0] z;
+    // Instantiate the DUT (Device Under Test)
+    Mux4to1 #(.width(width)) uut (
+        .a(a),
+        .b(b),
+      .c(c),
+      .d(d),
+        .sel(sel),
+        .z(z)
+    );
+
+    initial begin
+      $display("time sel   a    b    | z");
+        $display("---------------------------------------");
+
+        // Test 1: sel=0 -> expect z=a
+        a = 8'hAA;  // 10101010
+        b = 8'h55;  // 01010101
+        sel = 0;
+        #10 $display("%4t  %b   %h   %h   | %h", $time, sel, a, b, z);
+
+        // Test 2: sel=1 -> expect z=0 (based on your code)
+        sel = 1;
+        #10 $display("%4t  %b   %h   %h   | %h", $time, sel, a, b, z);
+
+        // Test 3: change inputs while sel=0
+        sel = 0;
+        a = 8'hF0;
+        b = 8'h0F;
+        #10 $display("%4t  %b   %h   %h   | %h", $time, sel, a, b, z);
+
+        // Test 4: change inputs while sel=1
+        sel = 1;
+        a = 8'hFF;
+        b = 8'h11;
+        #10 $display("%4t  %b   %h   %h   | %h", $time, sel, a, b, z);
+       
+        $finish;
+    end
+
+endmodule
