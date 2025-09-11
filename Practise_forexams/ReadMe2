@@ -1,0 +1,8 @@
+1.Write a bash or fish script that takes an argument argument1 which can come from the command line
+or declared inside the script.
+2.argument1 is a filename for input .e.g. usernames.txt, which contains a list of usernames.
+The script reads users from usernames.txt and returns:
+3. Up to 20 last login dates of each user.
+4. Up to last 20 login IPs and hostnames of each user.
+The script would be invoked like this ./myscript.sh usernames.txt ,or in the case of the variable
+being declared inside the script the script is invoked by ./myscript.sh
