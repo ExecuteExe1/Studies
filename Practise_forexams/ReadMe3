@@ -1,0 +1,15 @@
+1.Write a bash or fish script that takes two arguments argument1, argument2 which can come from
+the command line or declared inside the script.
+2.argument1 is a filename for input .e.g. usernames.txt, which contains a list of usernames.
+3.argument2 is a string, i.e. the name of a file to look for in the users’ home directory.
+The script reads users from usernames.txt and returns for each user and the filename argument2
+4) “File not found” if the file is not there.
+5) “Permission denied” if there is no access to the home folder of the user.
+6) “File found, size xxxx bytes” if file is found.
+The script would be invoked like this ./myscript.sh usernames.txt “tarbal.tar.gz” , or in
+the case of the variables being declared inside the script the script is invoked by ./myscript.sh
+Example below, where argument2 is "tarball.tar.gz” and argument1 is
+usernames.txt which contains the following users:
+1)batman
+2)superman
+3)Wonderwoman
