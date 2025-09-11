@@ -6,3 +6,5 @@ The script reads users from usernames.txt and returns:
 4. Up to last 20 login IPs and hostnames of each user.
 The script would be invoked like this ./myscript.sh usernames.txt ,or in the case of the variable
 being declared inside the script the script is invoked by ./myscript.sh
+
+{for Argument1}
