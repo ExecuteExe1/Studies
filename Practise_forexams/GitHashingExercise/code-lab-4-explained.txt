@@ -1,0 +1,91 @@
+Example 1:
+Execution command:gcc example1.c -o example1 then we ./example1
+Example Usage: We run multiple child processing and we need to keep track of them in our OS?
+Output:Parent Process: PID = 3188831, Created Child PID = 3188832
+Child Process: PID = 3188832, Parent PID = 3188831
+total 124
+-rwxrwxr-x 1 fotekokk fotekokk 17048 Dec  9 11:46 example1
+-rwxrwxr-x 1 fotekokk fotekokk   855 Dec  9 11:45 example1.c
+-rwxrwxr-x 1 fotekokk fotekokk 16792 Dec  9 11:50 example2
+-rwxrwxr-x 1 fotekokk fotekokk   347 Dec  9 11:49 example2.c
+-rwxrwxr-x 1 fotekokk fotekokk 17000 Dec  9 11:54 example3
+
+Code Explaination:
+set pid to later call fork()
+fork()= creates a child process with pid=0 and then returns the child's pid to the parent
+we check if the fork has ran successfully {if pid<0}
+else if(pid==0) = the child process. getpid() is used to get the child's pid while getppid() to get the paren'ts pid
+
+else = we move to the parent process
+wait(NULL) is used to wait for the child process to finish
+
+
+
+Example 2:
+Execution Command:gcc example2.c -o example2 then we run ./example2
+Example Usage:Maybe identifying parents and child processes?without fork()?
+Output:Current Process ID (PID): 3189139
+Parent Process ID (PPID): 3188045
+
+Code Explanation:
+pid_t pid,ppid used to ids
+pid=getpid() gets the pid of the current process
+ppid=getppid() gets the parent's PID of the current process
+
+Example 3:
+Execution Command:gcc example3.c -o example3 then we run ./example3
+Example Usage:Maybe killing processes working on the background or monitoring them???
+Output: 
+Process ID: 3189142
+Press Ctrl+C to trigger SIGINT.
+Running... Press Ctrl+C to exit.
+^C
+Caught signal 2 (SIGINT). Exiting gracefully...
+
+Code Explanation:
+we have the signal handler function for the sigint that notify us if we catch the signal when triggered
+
+In main:
+We initialize the SIGINT handler and check for errors thus the if(signal(SIGINT,sigint_handler)==SIG_ERR)
+
+Then we get the pid of the child  and wait for the ctrl+c to be triggered
+That's why we have the while(1) infinite loop
+
+Example 4:
+Execution Command:gcc example4.c -o example4 then we run ./example4
+Example Usage:Prevetion of unwanted termination?Or Termination resistance for accidents maybe?
+Output:
+rocess ID: 3189332
+Press Ctrl+C to attempt to send SIGINT.
+Running... Try pressing Ctrl+C.
+^C
+Received SIGINT (signal 2), but ignoring it.
+Running... Try pressing Ctrl+C.
+^C
+Received SIGINT (signal 2), but ignoring it.
+Running... Try pressing Ctrl+C.
+^C
+Received SIGINT (signal 2), but ignoring it.
+Running... Try pressing Ctrl+C.
+^C
+Received SIGINT (signal 2), but ignoring it.
+Running... Try pressing Ctrl+C.
+Running... Try pressing Ctrl+C.
+{runs infinitely}
+
+Code Explanation:
+The sigint_handler function does NOTHING here cause it gets ignored thus the lack of exit(0);
+The if once again checks for errors
+Then we get the porcess ID and we ask for the Ctrl+C trigger  
+But this does nothing thus the infinite while loop keeps running
+
+Example 5:
+Execution Command:gcc example5.c -o example5 then we run ./example5
+Example Usage:Seems like Process Monitoring again?
+Output:
+Parent process ID: 3189427. Child PID: 3189428
+Child process ID: 3189428. Waiting for SIGUSR1...
+^C
+
+Code Explanation:
+
