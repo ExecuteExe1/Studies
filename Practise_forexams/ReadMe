@@ -1,0 +1,7 @@
+Quiz1:
+
+1.Create folder  quiz-1 in home folder
+2.Sum of AEM digits,Sum<10(single digit sum)
+3.Create 10+N txt files with random names must have 6-8 lowercase characters
+4. Fill each file with random combinations of the words super,spider,bat {Number of words N+10}
+5.Count the times we have encountered each word and create a report.txt file  /home/yourusername/quiz-1/report.txt 
