@@ -1,0 +1,12 @@
+NeuralNetworks/__pycache__/
+NeuralNetworks/venv/
+NeuralNetworks/datasets/
+NeuralNetworks/checkpoints/
+*.pth
+*.h5
+NeuralNetworks/__pycache__/
+NeuralNetworks/venv/
+NeuralNetworks/datasets/
+NeuralNetworks/checkpoints/
+*.pth
+*.h5
